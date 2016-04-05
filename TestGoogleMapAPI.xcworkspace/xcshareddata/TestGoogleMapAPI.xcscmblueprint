@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "A8672B521F459E420C845B36C6EDB9456656F278",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "A8672B521F459E420C845B36C6EDB9456656F278" : 0,
+    "8E110D22B569A092B2109CB88D91C33335CF3A9B" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E2E4961E-60DD-44DD-9915-9591EFC33CF1",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "A8672B521F459E420C845B36C6EDB9456656F278" : "poc-at-work\/",
+    "8E110D22B569A092B2109CB88D91C33335CF3A9B" : "poc"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "TestGoogleMapAPI",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "TestGoogleMapAPI\/TestGoogleMapAPI.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/bengasi\/poc.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "8E110D22B569A092B2109CB88D91C33335CF3A9B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/bitbucket.org\/bengasi\/poc-at-work.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A8672B521F459E420C845B36C6EDB9456656F278"
+    }
+  ]
+}
