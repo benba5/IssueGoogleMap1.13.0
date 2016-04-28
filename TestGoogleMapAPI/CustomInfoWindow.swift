@@ -23,5 +23,7 @@ class CustomInfoWindow: UIImageView {
     }
     */
   
-    
+    override func didMoveToSuperview() {
+        superview?.autoresizesSubviews = false;
+    }
 }
