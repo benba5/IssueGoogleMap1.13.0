@@ -33,6 +33,35 @@ class ViewController: UIViewController  {
         initializeMapViewAtFixedLatitude(0, longitude: 0)
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        // To prevent automatically unseleting the marker
+        mapView.addObserver(self, forKeyPath: "selectedMarker", options: NSKeyValueObservingOptions.New.union(NSKeyValueObservingOptions.Old), context: nil)
+        
+        self.putMarkerAt(13.762817, long: 100.582584)
+        self.putMarkerAt(13.7628919998214, long: 100.570806339383)
+        self.putMarkerAt(13.7685878723028, long: 100.570005364716)
+        self.putMarkerAt(13.7686191339266, long: 100.574107132852)
+        self.putMarkerAt(13.7684944130482, long: 100.581125468016)
+        self.putMarkerAt(13.7740970176775, long: 100.57875405997)
+        self.putMarkerAt(13.7740970176775, long: 100.571447387338)
+        self.putMarkerAt(13.7626116151172, long: 100.579042397439)
+        self.putMarkerAt(13.7594990292437, long: 100.572857223451)
+        self.putMarkerAt(13.7655997627992, long: 100.567826069891)
+        self.putMarkerAt(13.7688366626101, long: 100.585355646908)
+        self.putMarkerAt(13.7669850571967, long: 100.576880201697)
+        self.putMarkerAt(13.7663389782731, long: 100.573661550879)
+        self.putMarkerAt(13.7657345802449, long: 100.575657114387)
+        self.putMarkerAt(13.7698819697782, long: 100.577330812812)
+        self.putMarkerAt(13.7702779478462, long: 100.57488463819)
+        self.putMarkerAt(13.7687357136953, long: 100.576515421271)
+        self.putMarkerAt(13.7682772096887, long: 100.57801745832)
+        self.putMarkerAt(13.7712157879637, long: 100.575914606452)
+        self.putMarkerAt(13.7704446752532, long: 100.57630084455)
+        
+        self.mapView.animateToLocation(CLLocationCoordinate2D(latitude: 13.769, longitude: 100.576))
+    }
+    
     func configureLocationService() {
         let status = CLLocationManager.authorizationStatus()
         
@@ -65,16 +94,23 @@ class ViewController: UIViewController  {
     }
     
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        if context == &myContext {
-            if let newValue = change?[NSKeyValueChangeNewKey] {
-                
-                print("myLocation property has been changed to : \(newValue)")
-                
-                if let newLocation = newValue as? CLLocation {
-                    self.mapView.camera = GMSCameraPosition.cameraWithTarget(newLocation.coordinate, zoom: self.mapView.camera.zoom)
-                    self.mapView.removeObserver(self, forKeyPath: "myLocation", context:&myContext)
+        /*
+        if keyPath == "myLocation" {
+            if context == &myContext {
+                if let newValue = change?[NSKeyValueChangeNewKey] {
+                    
+                    print("myLocation property has been changed to : \(newValue)")
+                    
+                    if let newLocation = newValue as? CLLocation {
+                        self.mapView.camera = GMSCameraPosition.cameraWithTarget(newLocation.coordinate, zoom: self.mapView.camera.zoom)
+                        self.mapView.removeObserver(self, forKeyPath: "myLocation", context:&myContext)
+                    }
                 }
             }
+        }
+        */
+        if keyPath == "selectedMarker" {
+            keepSelectMarkerIfNoNewSelected(change)
         }
     }
     
@@ -103,20 +139,23 @@ class ViewController: UIViewController  {
 
 extension ViewController: GMSMapViewDelegate {
     
-    func mapView(mapView: GMSMapView, didTapAtCoordinate coordinate: CLLocationCoordinate2D) {
-        print("GMSMapViewDelegate >> You tapped at \(coordinate.latitude), \(coordinate.longitude)")
-        self.putMarkerAt(coordinate.latitude, long: coordinate.longitude)
+    func mapView(mapView: GMSMapView, didCloseInfoWindowOfMarker marker: GMSMarker) {
+        print("GMSMapViewDelegate >> Did close info window")
     }
+    
+    func mapView(mapView: GMSMapView, didTapMarker marker: GMSMarker) -> Bool {
+        mapView.animateToLocation(marker.position)
+        mapView.selectedMarker  = marker
+        return true
+    }
+    
+//    func mapView(mapView: GMSMapView, didTapAtCoordinate coordinate: CLLocationCoordinate2D) {
+//        print("GMSMapViewDelegate >> You tapped at \(coordinate.latitude), \(coordinate.longitude)")
+//        self.putMarkerAt(coordinate.latitude, long: coordinate.longitude)
+//    }
     
     func mapView(mapView: GMSMapView, idleAtCameraPosition cameraPosition: GMSCameraPosition) {
         print("GMSMapViewDelegate >> map view idleAtCameraPosition", cameraPosition)
-        
-        let marker = GMSMarker()
-        marker.position     = cameraPosition.target     // coordinate at center of the map
-        marker.title        = "Test title"
-        marker.snippet      = "Test snippet"
-        marker.map = mapView
-        
     }
     
     func mapView(mapView: GMSMapView, didTapInfoWindowOfMarker marker: GMSMarker) {
@@ -129,21 +168,31 @@ extension ViewController: GMSMapViewDelegate {
             ISSUE
      **********************************/
     func mapView(mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
-        let resources = NSBundle.mainBundle().loadNibNamed("CustomInfoWindow", owner: self, options:nil) as Array
         
-        let optionalInfoWindow = resources.first as! CustomInfoWindow?
+        let resources           = NSBundle.mainBundle().loadNibNamed("SelectionPopup", owner: self, options:nil) as Array
+        let optionalInfoWindow  = resources.first as! SelectionPopup
+        return optionalInfoWindow
         
-        if let infoWindow = optionalInfoWindow {
-            infoWindow.time.text                = "5"
-            infoWindow.distanceWithUnit.text    = "55 km"
-            return infoWindow
-        }
-        return nil
     }
 }
 
 extension ViewController {
     
+    private func keepSelectMarkerIfNoNewSelected (change: [String: AnyObject]?) {
+        print("----- keep select marker if no new selected ----")
+        guard let change = change else {
+            return
+        }
+        print("New \(change[NSKeyValueChangeNewKey])")
+        print("Old \(change[NSKeyValueChangeOldKey])")
+        if let old = change[NSKeyValueChangeOldKey] where change[NSKeyValueChangeNewKey] is NSNull {
+            if let oldMarker = old as? GMSMarker {
+                print("!!! KEEP SELECT OLD !!!")
+                mapView.selectedMarker  = oldMarker
+            }
+        }
+    }
+
     func iconSize() -> CGSize {
         return CGSize(width: self.view.bounds.width / 10, height: self.view.bounds.width / 10)
     }
